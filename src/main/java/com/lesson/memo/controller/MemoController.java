@@ -77,8 +77,8 @@ public class MemoController {
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model, HttpServletResponse response) {
-        if (model.containsAttribute("memo")) {
-        	model.addAttribute("priorities", Priority.values());
+    	model.addAttribute("priorities", Priority.values());
+    	if (model.containsAttribute("memo")) {
             return "memo-form";
         }
 
@@ -99,20 +99,20 @@ public class MemoController {
             BindingResult result,
             HttpServletResponse response,
             RedirectAttributes redirectAttributes) {
+    	
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.memo", result);
+            redirectAttributes.addFlashAttribute("memo", memo);
+            return "redirect:/memo/edit/" + id;
+        }
 
         Optional<Memo> opt = memoRepository.findById(id);
         if (opt.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return "not-found"; // エラー画面表示
+            return "not-found";
         }
 
         Memo memoToUpdate = opt.get();
-
-        if (result.hasErrors()) {
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.memo", result);
-            redirectAttributes.addFlashAttribute("memo", memo);
-            return "redirect:/memo/edit/" + id; // editにリダイレクト
-        }
 
         memoToUpdate.setTitle(memo.getTitle());
         memoToUpdate.setContent(memo.getContent());

@@ -20,7 +20,7 @@
                 <h2 class="note-card-title" th:text="${memo.title}">タイトル</h2>
 				<span th:if="${memo.priority != null}"
 				      th:text="${memo.priority.label}"
-				      th:class="${'note-badge priority.' + memo.priority.name().toLowerCase()}">
+				      th:class="${'note-badge ' + memo.priority.name().toLowerCase()}">
 				</span>
             </div>
             <div class="note-card-content">
