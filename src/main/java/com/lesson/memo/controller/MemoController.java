@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.lesson.memo.model.Memo;
@@ -33,13 +34,35 @@ public class MemoController {
     public String list(Model model) {
         List<Memo> memos = memoRepository.findAll().stream().sorted((a, b) -> {
         	if (a.getPriority() == null) return 1;
-        	if (a.getPriority() == null) return -1;
+        	if (b.getPriority() == null) return -1;
         	return a.getPriority().ordinal() - b.getPriority().ordinal();
         })
         .toList();
         model.addAttribute("memos", memos);
         return "memo-list";
     }
+
+    @GetMapping("/search")
+    public String search(@RequestParam(required = false) String keyword, Model model) {
+        List<Memo> memos;
+            
+        if (keyword == null || keyword.isEmpty()) {
+            memos = memoRepository.findAll();
+        } else {
+            memos = memoRepository.findByTitleContainingOrContentContaining(keyword, keyword);
+        }
+        
+        memos = memos.stream().sorted((a, b) -> {
+            if (a.getPriority() == null) return 1;
+            if (a.getPriority() == null) return -1;
+            return a.getPriority().ordinal() - b.getPriority().ordinal();
+        })
+        .toList();
+
+        model.addAttribute("memos", memos);
+        model.addAttribute("keyword", keyword != null ? keyword : "");
+        return "memo-list";
+            }
 
     @GetMapping("/new")
     public String showForm(Model model) {
